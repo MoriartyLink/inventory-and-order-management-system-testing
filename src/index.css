@@ -1,0 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --color-brand-deep: #2D1B4D;
+  --color-brand-pink: #D8B4FE;
+  --color-brand-light: #EBD3FF;
+  --color-brand-bg: #F8F4FF;
+  --color-brand-accent: #9D4EDD;
+}
+
+@layer base {
+  body {
+    @apply bg-brand-bg text-brand-deep min-h-screen font-sans antialiased;
+    background-attachment: fixed;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white/40 backdrop-blur-xl border border-white/40 shadow-xl rounded-[32px];
+  }
+  
+  .glass-header {
+    @apply bg-white/40 backdrop-blur-xl border border-white/40 shadow-lg rounded-[32px];
+  }
+
+  .glass-input {
+    @apply bg-white/50 border-none rounded-2xl px-10 py-2 text-sm focus:ring-2 focus:ring-brand-light placeholder:text-brand-deep/30 outline-none transition-shadow;
+  }
+
+  .liquid-button {
+    @apply relative overflow-hidden transition-all duration-300 active:scale-95 text-white font-bold px-6 py-3 rounded-2xl bg-brand-accent;
+    box-shadow: 0 8px 20px rgba(157, 78, 221, 0.25);
+  }
+
+  .liquid-button:hover {
+    @apply shadow-lg shadow-brand-accent/40;
+    filter: brightness(1.05);
+  }
+
+  .nav-active {
+    @apply bg-white/60 shadow-sm border border-white/40 font-semibold;
+  }
+
+  .tracking-card {
+    @apply rounded-[32px] bg-brand-deep text-brand-bg p-8 shadow-2xl relative overflow-hidden;
+  }
+}
+
+.liquid-blob {
+  display: none;
+}

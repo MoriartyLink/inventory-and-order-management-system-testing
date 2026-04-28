@@ -1,0 +1,78 @@
+{
+  "entities": {
+    "Product": {
+      "title": "Product",
+      "description": "An item available for sale in the shop.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "The name of the product." },
+        "description": { "type": "string", "description": "A detailed description." },
+        "price": { "type": "number", "description": "The price of the item." },
+        "stock": { "type": "number", "description": "Current inventory count." },
+        "category": { "type": "string", "description": "Product category." },
+        "imageUrl": { "type": "string", "description": "URL to the product image." },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "price", "stock"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "A customer order for one or more products.",
+      "type": "object",
+      "properties": {
+        "customerName": { "type": "string" },
+        "customerEmail": { "type": "string" },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "productId": { "type": "string" },
+              "productName": { "type": "string" },
+              "quantity": { "type": "number" },
+              "price": { "type": "number" }
+            }
+          }
+        },
+        "totalAmount": { "type": "number" },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "processing", "shipped", "delivered", "cancelled"]
+        },
+        "trackingNumber": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["customerName", "items", "totalAmount", "status"]
+    },
+    "User": {
+      "title": "User",
+      "description": "User profile and role management.",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" },
+        "name": { "type": "string" },
+        "role": {
+          "type": "string",
+          "enum": ["owner", "admin"]
+        }
+      },
+      "required": ["email", "role"]
+    }
+  },
+  "firestore": {
+    "products": {
+      "schema": "Product",
+      "description": "Collection of all products in inventory."
+    },
+    "orders": {
+      "schema": "Order",
+      "description": "Collection of customer orders."
+    },
+    "users": {
+      "schema": "User",
+      "description": "Collection of user profiles and roles."
+    }
+  }
+}

@@ -1,0 +1,95 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // 3. Primitive helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function getUserData(userId) {
+      return get(/databases/$(database)/documents/users/$(userId)).data;
+    }
+
+    function currentUserData() {
+      return getUserData(request.auth.uid);
+    }
+
+    function isAdmin() {
+      return isSignedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid)) 
+             && (currentUserData().role == 'admin' || currentUserData().role == 'owner');
+    }
+
+    function isSystemOwner() {
+      return isSignedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid)) 
+             && currentUserData().role == 'owner';
+    }
+
+    // 4. Products
+    match /products/{productId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidProduct(request.resource.data);
+      allow update: if isAdmin() && isValidProduct(request.resource.data);
+      allow delete: if isAdmin();
+
+      function isValidProduct(data) {
+        return data.keys().hasAll(['name', 'price', 'stock', 'category'])
+          && data.name is string && data.name.size() > 0 && data.name.size() <= 200
+          && data.price is number && data.price >= 0
+          && data.stock is number && data.stock >= 0
+          && data.category is string;
+      }
+    }
+
+    // 5. Orders
+    match /orders/{orderId} {
+      allow read: if isAdmin();
+      allow create: if isSignedIn() && isValidOrder(request.resource.data);
+      allow update: if isAdmin() && isValidOrder(request.resource.data);
+      allow delete: if isAdmin();
+
+      function isValidOrder(data) {
+        return data.keys().hasAll(['customerName', 'totalAmount', 'status', 'items', 'createdAt'])
+          && data.customerName is string && data.customerName.size() > 0 && data.customerName.size() <= 200
+          && data.totalAmount is number && data.totalAmount >= 0
+          && data.status in ['pending', 'processing', 'shipped', 'delivered', 'cancelled']
+          && data.items is list
+          && data.createdAt is timestamp;
+      }
+    }
+
+    // 6. Users
+    match /users/{userId} {
+      allow read: if isSignedIn() && (isOwner(userId) || isAdmin());
+      
+      // Allow self-creation for the first time
+      allow create: if isOwner(userId) && (
+        (request.resource.data.role == 'owner' && request.auth.token.email == 'moriartylink@gmail.com') ||
+        (request.resource.data.role == 'admin')
+      ) && isValidUser(request.resource.data);
+
+      allow update: if isSystemOwner() || (isOwner(userId) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role']));
+      allow delete: if isSystemOwner();
+
+      function isValidUser(data) {
+        return data.keys().hasAll(['email', 'name', 'role', 'createdAt'])
+          && data.email is string && data.email.size() > 0
+          && data.name is string && data.name.size() > 0
+          && data.role in ['admin', 'owner']
+          && (data.createdAt is timestamp || data.createdAt == request.time);
+      }
+    }
+  }
+}
