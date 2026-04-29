@@ -103,22 +103,24 @@ export default function App() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-brand-bg">
         <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="glass-card p-12 max-w-md w-full text-center space-y-8"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="glass-card p-10 max-w-md w-full text-center space-y-8"
         >
-          <div className="w-24 h-24 bg-brand-light rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
-            <Package className="w-12 h-12 text-white" />
+          <div className="w-20 h-20 bg-brand-light rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
+            <Package className="w-10 h-10 text-brand-accent" />
           </div>
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight text-brand-deep leading-tight">Inventory Management & Order System</h1>
-            <p className="text-brand-deep/60">Professional Fulfillment Platform</p>
+            <h1 className="text-2xl font-bold tracking-tight text-brand-deep leading-tight">Order & Fulfillment Center</h1>
+            <p className="text-brand-deep/50 text-sm">Sign in to manage your inventory and orders</p>
           </div>
           <button 
+            id="google-signin-btn"
             onClick={signIn}
-            className="liquid-button w-full flex items-center justify-center gap-3 active:scale-95 transition-transform"
+            className="liquid-button w-full shadow-lg"
           >
             <UserIcon className="w-5 h-5" />
             Sign in with Google
